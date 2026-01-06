@@ -20,9 +20,48 @@ class StoreBookRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            
-        ];
-    }
+
+{
+    return [
+        'ISBN' => [
+            'required',
+            'string',
+            'size:13',
+            'unique:books,ISBN'
+        ],
+
+        'title' => [
+            'required',
+            'string',
+            'max:70'
+        ],
+
+        'price' => [
+            'nullable',
+            'numeric',
+            'min:0',
+            'max:99.99'
+        ],
+
+        'mortgage' => [
+            'required',
+            'numeric',
+            'min:0',
+            'max:9999.99'
+        ],
+
+        'authorship_date' => [
+            'nullable',
+            'date'
+        ],
+
+        'category_id' => [
+            'required',
+            'integer',
+            'exists:categories,id'
+        ],
+    ];
+}
+
+
 }

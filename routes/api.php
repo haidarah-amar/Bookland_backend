@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\AuthorController;
 
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -56,3 +57,4 @@ Route:: prefix('categories')->group(function () {
 
 Route::apiResource('author', AuthorController::class);
 
+Route::apiResource('books' , BookController::class);
