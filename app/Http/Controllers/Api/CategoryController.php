@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\ResponseHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -28,6 +29,12 @@ class CategoryController extends Controller
         ]);
         $category = new Category();
         $category->name = $request->name;
+         if ($request->hasFile('icon')){
+            $file = $request->file('icon');
+            $filename = "$request->name." . $file->extension();
+            Storage::putFileAs('category-icons', $file ,$filename );
+            $category->icon = $filename;
+        }
         $category->save();
         return ResponseHelper::success("تمت إضافة الصنف" , $category);
     }
@@ -45,6 +52,12 @@ class CategoryController extends Controller
 
         $category = Category::find($id);
         $category->name = $request->name;
+            if ($request->hasFile('icon')){
+                $file = $request->file('icon');
+                $filename = "$request->name." . $file->extension();
+                Storage::putFileAs('category-icons', $file ,$filename );
+                $category->icon = $filename;
+            }
         $category->save();
         return ResponseHelper::success("تم تعديل الصنف" , $category);
 
