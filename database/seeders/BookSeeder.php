@@ -15,10 +15,9 @@ class BookSeeder extends Seeder
     {
         $book = [
             "ISBN" => "1112223334445",
-            "title" => "تيسير الأمور في ملء القدور",
+
 
             "title" => "أطلس",
-
             "price" => 1,
             "mortgage" => 10,
             "category_id" => 5
