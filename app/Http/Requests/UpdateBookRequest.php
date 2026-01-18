@@ -59,6 +59,8 @@ class UpdateBookRequest extends FormRequest
             'integer',
             'exists:categories,id'
         ],
+        'authors' => 'sometimes|array|min:1',
+        'authors.*' => 'exists:authors,id',
     ];
 }
 

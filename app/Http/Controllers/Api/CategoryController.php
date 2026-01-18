@@ -71,6 +71,10 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $category = Category::find($id);
+        $count = $category->books()->count();
+        if ($count > 0) {
+            return ResponseHelper::failed("لا يمكن حذف الصنف لوجود كتب مرتبطة به", 422);
+        }
         $category->delete();
         return ResponseHelper::success("تم حذف الصنف" , $category);
     }

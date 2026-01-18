@@ -60,6 +60,9 @@ class StoreBookRequest extends FormRequest
             'integer',
             'exists:categories,id'
         ],
+        
+        'authors' => 'required|array|min:1',
+        'authors.*' => 'exists:authors,id',
     ];
 }
 

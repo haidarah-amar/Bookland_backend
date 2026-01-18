@@ -8,6 +8,7 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\ResponseHelper;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -16,7 +17,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $book = Book::all();
+        $book = Book::all() ->with('category:name')->with('author:name')->get();
         return ResponseHelper::success(' جميع الكتب', $book);
     }
 
@@ -37,6 +38,7 @@ class BookController extends Controller
             $book->cover = $filename;
             $book->save();
         }
+        $book->authors()->attach($request->authors);
         return ResponseHelper::success("تمت إضافة الكتاب", $book);
     }
 
@@ -45,7 +47,8 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        $book->load('category', 'authors');
+        return ResponseHelper::success("تفاصيل الكتاب", $book);
     }
 
 
@@ -53,18 +56,47 @@ class BookController extends Controller
      * Update the specified resource in storage.
      */
     public function update(UpdateBookRequest $request, Book $book)
-    {
-        $book->update($request->all());
-        return ResponseHelper::success("تمت تعديل الكتاب", $book);
-
+{
+    if ($request->filled('authors')) {
+        $book->authors()->sync($request->authors);
     }
+
+    if ($request->hasFile('cover')) {
+
+        if ($book->cover && Storage::exists('book-images/' . $book->cover)) {
+            Storage::delete('book-images/' . $book->cover);
+        }
+
+        $file = $request->file('cover');
+        $filename = $book->ISBN . '.' . $file->extension();
+
+        Storage::putFileAs('book-images', $file, $filename);
+
+        $book->cover = $filename;
+    }
+
+    $book->update(
+        $request->except(['cover', 'authors'])
+    );
+
+    return ResponseHelper::success("تم تعديل الكتاب", $book);
+}
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Book $book)
-    {
+{
+    DB::transaction(function () use ($book) {
+
+        if ($book->cover && Storage::exists('book-images/' . $book->cover)) {
+            Storage::delete('book-images/' . $book->cover);
+        }
+
+        $book->authors()->detach();
         $book->delete();
-        return ResponseHelper::success("تمت حذف الكتاب", $book);
-    }
+    });
+
+    return ResponseHelper::success("تم حذف الكتاب", $book);
+}
 }
